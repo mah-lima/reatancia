@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indutor Mania: O Desafio Eletrizante</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #game-container {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    h1 {
+      color: #0066cc;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #circuit-display {
+      width: 100%;
+      height: 250px;
+      margin: 20px auto;
+      position: relative;
+      border: 3px solid #0066cc;
+      border-radius: 15px;
+      background: linear-gradient(45deg, #f0f8ff, #e6f2ff);
+      box-shadow: inset 0 0 10px rgba(0, 102, 204, 0.2);
+    }
+
+    #inductor-symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #voltage-info,
+    #frequency-info {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    #voltage-info {
+      top: 20px;
+      left: 20px;
+    }
+
+    #frequency-info {
+      bottom: 20px;
+      right: 20px;
+    }
+
+    button {
+      background-color: #0066cc;
+      color: black;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin: 10px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #004499;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    #lives {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+
+    input[type="number"] {
+      width: 120px;
+      padding: 10px;
+      margin-right: 10px;
+      border: 2px solid #0066cc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    #phase-info {
+      font-size: 1.2em;
+      color: #0066cc;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    #progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    #progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #45a049);
+      border-radius: 10px;
+      transition: width 0.5s ease-in-out;
+    }
+
+    #calculator {
+      background-color: #f0f8ff;
+      border: 2px solid #0066cc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #calculator input[type="text"] {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 1.2em;
+      border: 1px solid #0066cc;
+      border-radius: 5px;
+    }
+
+    #calculator-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    #calculator button {
+      padding: 10px;
+      font-size: 1em;
+      background-color: #e6f2ff;
+      border: 1px solid #0066cc;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #calculator button:hover {
+      background-color: #b3d9ff;
+    }
+
+    @media (max-width: 600px) {
+      #game-container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      #circuit-display {
+        height: 200px;
+      }
+
+      #inductor-symbol {
+        font-size: 50px;
+      }
+
+      #calculator-buttons {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-container">
+    <h1>Reatância indutiva</h1>
+    <div id="lives">❤️❤️❤️</div>
+    <div id="phase-info">Fase 1: Aprendiz de Indução</div>
+    <p>Calcule a reatância indutiva para o indutor mostrado!</p>
+    <div id="circuit-display">
+      <div id="inductor-symbol">🧲</div>
+      <div id="voltage-info"></div>
+      <div id="frequency-info"></div>
+    </div>
+    <p id="inductor-value"></p>
+    <div id="controls">
+      <form onsubmit="checkAnswer(event)">
+        <input type="number" id="user-answer" step="0.01" required="" placeholder="Reatância (Ω)">
+        <button type="submit">Verificar Resposta</button>
+      </form>
+    </div>
+    <div id="result"></div>
+    <div id="progress-bar">
+      <div id="progress"></div>
+    </div>
+  </div>
+  <div id="game-container">
+    <div id="calculator">
+      <input type="text" id="calc-display" readonly="">
+      <div id="calculator-buttons">
+        <button onclick="appendToCalc('7')">7</button>
+        <button onclick="appendToCalc('8')">8</button>
+        <button onclick="appendToCalc('9')">9</button>
+        <button onclick="appendToCalc('+')">+</button>
+        <button onclick="appendToCalc('4')">4</button>
+        <button onclick="appendToCalc('5')">5</button>
+        <button onclick="appendToCalc('6')">6</button>
+        <button onclick="appendToCalc('-')">-</button>
+        <button onclick="appendToCalc('1')">1</button>
+        <button onclick="appendToCalc('2')">2</button>
+        <button onclick="appendToCalc('3')">3</button>
+        <button onclick="appendToCalc('*')">*</button>
+        <button onclick="appendToCalc('0')">0</button>
+        <button onclick="appendToCalc('.')">.</button>
+        <button onclick="calculateResult()">=</button>
+        <button onclick="appendToCalc('/')">/</button>
+        <button onclick="clearCalc()">C</button>
+        <button onclick="appendToCalc('(')">(</button>
+        <button onclick="appendToCalc(')')">)</button>
+        <button onclick="backspace()">⌫</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      let GG_ALL_GAME_CONFIG = {
+        minInductance: 1, // Indutância mínima em mH
+        maxInductance: 100, // Indutância máxima em mH
+        minFrequency: 50, // Frequência mínima em Hz
+        maxFrequency: 400, // Frequência máxima em Hz
+        inductorEmoji: "🧲", // Emoji para representar um indutor
+        maxLives: 3, // Número máximo de vidas
+        tolerance: 0.1, // Tolerância para a resposta (10%)
+        phasesConfig: [ // Configuração das fases
+          {
+            name: "Aprendiz de Indução",
+            questionsToComplete: 2,
+            inductanceRange: [1, 50]
+          },
+          {
+            name: "Técnico em Reatância",
+            questionsToComplete: 2,
+            inductanceRange: [50, 100]
+          },
+          {
+            name: "Engenheiro de Circuitos",
+            questionsToComplete: 2,
+            inductanceRange: [100, 200]
+          },
+          {
+            name: "Mestre dos Indutores",
+            questionsToComplete: 2,
+            inductanceRange: [200, 500]
+          },
+          {
+            name: "Doutor em Eletromagnetismo",
+            questionsToComplete: 2,
+            inductanceRange: [500, 750]
+          },
+          {
+            name: "Guru da Impedância",
+            questionsToComplete: 2,
+            inductanceRange: [750, 1000]
+          },
+          {
+            name: "Lendário Magnetizador",
+            questionsToComplete: 2,
+            inductanceRange: [1000, 1250]
+          },
+          {
+            name: "Arquimago da Indutância",
+            questionsToComplete: 2,
+            inductanceRange: [1250, 1500]
+          },
+          {
+            name: "Senhor do Fluxo Magnético",
+            questionsToComplete: 2,
+            inductanceRange: [1500, 2000]
+          },
+          {
+            name: "Divindade da Eletricidade",
+            questionsToComplete: 2,
+            inductanceRange: [2000, 2500]
+          }
+        ]
+      };
+      let gameState = {
+        currentInductance: 0,
+        currentFrequency: 0,
+        currentVoltage: 0,
+        lives: GG_ALL_GAME_CONFIG.maxLives,
+        currentPhase: 0,
+        questionsAnswered: 0
+      };
+
+      function generateNewCircuit() {
+        const currentPhaseConfig = GG_ALL_GAME_CONFIG.phasesConfig[gameState.currentPhase];
+        gameState.currentInductance = Math.floor(Math.random() * (currentPhaseConfig.inductanceRange[1] - currentPhaseConfig.inductanceRange[0] + 1)) + currentPhaseConfig.inductanceRange[0];
+        gameState.currentFrequency = Math.floor(Math.random() * (GG_ALL_GAME_CONFIG.maxFrequency - GG_ALL_GAME_CONFIG.minFrequency + 1)) + GG_ALL_GAME_CONFIG.minFrequency;
+        gameState.currentVoltage = Math.floor(Math.random() * (GG_ALL_GAME_CONFIG.maxVoltage - GG_ALL_GAME_CONFIG.minVoltage + 1)) + GG_ALL_GAME_CONFIG.minVoltage;
+        document.getElementById('inductor-value').textContent = `Indutância: ${gameState.currentInductance} mH`;
+        document.getElementById('frequency-info').textContent = `${gameState.currentFrequency} Hz`;
+        document.getElementById('result').textContent = '';
+        document.getElementById('user-answer').value = '';
+        updatePhaseInfo();
+        updateProgressBar();
+      }
+
+      function checkAnswer(event) {
+        event.preventDefault();
+        let userAnswer = parseFloat(document.getElementById('user-answer').value);
+        let correctAnswer = 2 * Math.PI * gameState.currentFrequency * (gameState.currentInductance / 1000);
+        let lowerBound = correctAnswer * (1 - GG_ALL_GAME_CONFIG.tolerance);
+        let upperBound = correctAnswer * (1 + GG_ALL_GAME_CONFIG.tolerance);
+        if (userAnswer >= lowerBound && userAnswer <= upperBound) {
+          document.getElementById('result').textContent = `Correto! A reatância indutiva é ${correctAnswer.toFixed(2)} Ω.`;
+          gameState.questionsAnswered++;
+          if (gameState.questionsAnswered >= GG_ALL_GAME_CONFIG.phasesConfig[gameState.currentPhase].questionsToComplete) {
+            advancePhase();
+          }
+          generateNewCircuit();
+        } else {
+          gameState.lives--;
+          updateLives();
+          if (gameState.lives > 0) {
+            document.getElementById('result').textContent = `Incorreto. Tente novamente! Você tem ${gameState.lives} vida(s) restante(s).`;
+          } else {
+            document.getElementById('result').textContent = `Fim de jogo! A resposta correta era ${correctAnswer.toFixed(2)} Ω.`;
+            document.querySelector('form').style.display = 'none';
+          }
+        }
+      }
+
+      function updateLives() {
+        document.getElementById('lives').textContent = '❤️'.repeat(gameState.lives);
+      }
+
+      function updatePhaseInfo() {
+        const currentPhase = GG_ALL_GAME_CONFIG.phasesConfig[gameState.currentPhase];
+        document.getElementById('phase-info').textContent = `Fase ${gameState.currentPhase + 1}: ${currentPhase.name}`;
+      }
+
+      function updateProgressBar() {
+        const currentPhase = GG_ALL_GAME_CONFIG.phasesConfig[gameState.currentPhase];
+        const progress = (gameState.questionsAnswered / currentPhase.questionsToComplete) * 100;
+        document.getElementById('progress').style.width = `${progress}%`;
+      }
+
+      function advancePhase() {
+        if (gameState.currentPhase < GG_ALL_GAME_CONFIG.phasesConfig.length - 1) {
+          gameState.currentPhase++;
+          gameState.questionsAnswered = 0;
+          alert(`Parabéns! Você avançou para a fase ${gameState.currentPhase + 1}: ${GG_ALL_GAME_CONFIG.phasesConfig[gameState.currentPhase].name}`);
+        } else {
+          finishGame();
+        }
+      }
+
+      function finishGame() {
+        const gameContainer = document.getElementById('game-container');
+        gameContainer.innerHTML = `
+<h1>Parabéns, Mestre da Indutância!</h1>
+<p>Você completou todas as 10 fases do jogo Indutor Mania: O Desafio Eletrizante!</p>
+<p>Seu domínio sobre indutores e reatância indutiva é verdadeiramente impressionante.</p>
+<p>Você é agora uma Divindade da Eletricidade, capaz de manipular campos magnéticos com seu pensamento!</p>
+<button onclick="restartGame()">Jogar Novamente</button>
+`;
+      }
+
+      function restartGame() {
+        gameState = {
+          currentInductance: 0,
+          currentFrequency: 0,
+          currentVoltage: 0,
+          lives: GG_ALL_GAME_CONFIG.maxLives,
+          currentPhase: 0,
+          questionsAnswered: 0
+        };
+        location.reload();
+      }
+      // Funções da calculadora
+      function appendToCalc(value) {
+        document.getElementById('calc-display').value += value;
+      }
+
+      function clearCalc() {
+        document.getElementById('calc-display').value = '';
+      }
+
+      function calculateResult() {
+        try {
+          const result = eval(document.getElementById('calc-display').value);
+          document.getElementById('calc-display').value = result;
+        } catch (error) {
+          document.getElementById('calc-display').value = 'Erro';
+        }
+      }
+
+      function backspace() {
+        const currentValue = document.getElementById('calc-display').value;
+        document.getElementById('calc-display').value = currentValue.slice(0, -1);
+      }
+      // Inicializar o jogo
+      generateNewCircuit();
+      // Expor funções ao escopo global
+      window.checkAnswer = checkAnswer;
+      window.restartGame = restartGame;
+      window.appendToCalc = appendToCalc;
+      window.clearCalc = clearCalc;
+      window.calculateResult = calculateResult;
+      window.backspace = backspace;
+    })();
+  </script>
+
+</body>
+
+</html>
